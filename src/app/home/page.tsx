@@ -62,7 +62,7 @@ export default function Home() {
     const fetchUserImage = async () => {
       try {
         if (userData) {
-          const response = await fetch(`/api/${userData?.id}/get-photo`, {
+          const response = await fetch(`/api/get-photo/${userData?.id}`, {
             method: "GET",
             credentials: "include",
           });
