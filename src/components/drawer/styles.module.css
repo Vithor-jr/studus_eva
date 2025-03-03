@@ -1,0 +1,17 @@
+.container {
+	background-color: #6048AC;
+	border-color: #6048AC;
+	border-radius: 0px 30px 30px 0px;
+}
+
+.container_trigger {
+	height: 100%;
+	background-color:black;
+}
+
+.container_image_left {
+	width: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

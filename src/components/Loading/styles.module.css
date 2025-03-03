@@ -1,0 +1,46 @@
+.body {
+	position: absolute;
+	background-color: var(--theme-secundary);
+	min-width: 100%;
+	min-height: 100%;
+	flex-direction: column;
+	z-index: 999;
+	align-items: center;
+	justify-content: center;
+	display: flex;
+}
+
+.container {
+	display: flex;
+	padding: 0px 20px;
+	min-height: 30vh;
+
+	flex-direction: row;
+	border-radius: 20px;
+	max-width: 80%;
+	align-items: center;
+}
+
+.text {
+	color: #F78223;
+	font-size:4.3rem;
+}
+
+.image {
+	width: 5rem;
+}
+
+@media(min-width:780px){
+	.text {
+		color: #F78223;
+		font-size:8rem;
+	}
+
+	.container {
+		height: 20rem;
+	}
+	
+	.image {
+		width: 10rem;
+	}
+}

@@ -1,0 +1,28 @@
+.input {
+	border-radius: 15px;
+	background-color: transparent;
+}
+
+
+.input::placeholder {
+	opacity: 0.4;
+	
+}
+
+.input_register {
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+
+@media (min-width: 780px){
+	.input_register {
+		width: 100%;
+		margin-bottom: 2rem;
+	}
+}
+
+input:focus {
+	outline: none;
+}
+

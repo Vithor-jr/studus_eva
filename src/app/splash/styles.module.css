@@ -1,0 +1,7 @@
+.text_left {
+	margin-right: 0px;
+}
+.logo-container {
+  width: clamp(100px, 20vw, 200px);
+  max-width: 100%;
+}
