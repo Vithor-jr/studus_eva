@@ -1,9 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
 ) {
-  const { id } = params; 
+  const id =  (await params).id
 
   const userId = parseInt(id, 10);
 
