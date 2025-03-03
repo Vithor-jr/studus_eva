@@ -22,7 +22,7 @@
 	}
 }
 
-input:focus {
+.input:focus {
 	outline: none;
 }
 
