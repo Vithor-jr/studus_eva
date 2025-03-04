@@ -57,12 +57,14 @@ export default function ResetPassword() {
           text: errorData.message || "Erro ao enviar e-mail. Tente novamente.",
           type: 'error'
         });
+        setLoading(false)
         return;
       }
   
       const data = await response.json();
   
       if (data.error) {
+        setLoading(false)
         setMessage({
           text:'Usuário não encontrado. Digite um e-mail cadastrado',
           type:'error'

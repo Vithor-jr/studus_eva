@@ -72,7 +72,7 @@ export default function EnterCod(){
 		setLoading(true);
 		setSubmited(true);
 	
-		const hasErrors = validate(); // Função de validação de campos
+		const hasErrors = validate();
 		if (hasErrors) {
 			setLoading(false);
 			return; 

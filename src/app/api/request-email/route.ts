@@ -4,7 +4,7 @@ export async function POST(req: Request){
 	try {
 		const body = await req.json();
 
-		const apiResponse = await fetch('https://auth-api-delta.vercel.app/request-password-reset', {
+		const apiResponse = await fetch('http://auth-api-delta.vercel.app/request-password-reset', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
