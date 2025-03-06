@@ -26,10 +26,12 @@ export default function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [photoURL, setPhotoURL] = useState("");
   const [loading, setLoading] = useState(true);
+  const [newCOnversationId, setNewConversationId] = useState<number>()
   const [conversations, setConversations] = useState()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const router = useRouter();
-  const [conversationId, setConversationId] = useState<number>()
+  const [isNewConversation, setIsNewConversation] = useState<boolean>(false)
+  const [conversationId, setConversationId] = useState<number>(0)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -112,7 +114,7 @@ export default function Home() {
   
     fetchUserImage();
     getCOnversations()
-  }, [userData?.id]);
+  }, [userData?.id, newCOnversationId]);
 
   if (loading) {
     return <Loading />;
@@ -131,7 +133,16 @@ export default function Home() {
               )}
           </div>
 
-          <Drawer conversationId={conversationId} setConversationId={(value:number)=>setConversationId(value)} conversations={conversations} userData={userData} url={photoURL} open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+          <Drawer 
+            createConversationFunction={()=>{setIsNewConversation(false), setConversationId(0)}}
+            conversationId={conversationId} 
+            setConversationId={(value:number)=>{setConversationId(value), setIsNewConversation(false)}} 
+            conversations={conversations} 
+            userData={userData}
+            url={photoURL}
+            open={isDrawerOpen}
+            onOpenChange={setIsDrawerOpen}
+          />
 
           <Image src={studus} alt="U" className="w-[50px] absolute bottom-[30px]" />
         </div>
@@ -145,8 +156,15 @@ export default function Home() {
             <Image src={eva} alt="eva" className="h-[60px] w-[60px]"/>
             <h1 className={`${varela_round.className} ${styles.title_eva}`}>Eva</h1>
           </div>
-            
-          <Chat userData={userData} setConversationId={(value) => setConversationId(value)} conversationId={conversationId}/>
+
+          <Chat 
+            isNewConversation={isNewConversation}
+            setIsNewConversation={(value:boolean) => setIsNewConversation(value)}
+            setNewConversatioId={(value: number | undefined) => setNewConversationId(value)} 
+            userData={userData} 
+            setConversationId={(value) => setConversationId(value)}
+            conversationId={conversationId}
+          />
         </div>
       </div>
     </>

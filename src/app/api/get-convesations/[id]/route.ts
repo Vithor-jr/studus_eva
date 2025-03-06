@@ -17,7 +17,7 @@ export async function GET(req: Request, {params}: {params: Promise<{id: string}>
       return NextResponse.json({ error: 'Token não encontrado' }, { status: 401 });
     }
 
-    const response = await fetch(`http://localhost:8000/conversations/${userId}`, {
+    const response = await fetch(`https://${process.env.API_URL}/conversations/${userId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

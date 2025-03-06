@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     const { title, userId } = await req.json();
 
-    const response = await fetch(`http:/localhost:8000/conversations`, {
+    const response = await fetch(`https://${process.env.API_URL}/conversations`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

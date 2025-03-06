@@ -6,8 +6,6 @@ import styles from './styles.module.css';
 import { Gemini } from '../../app/api/gemini'
 import { varela_round } from '@/app/fonts/fonts';
 
-import eva from '../../assets/assets_chat/eva.png'
-import background from '../../assets/assets_chat/background_chat.png'
 import MicNoneIcon from '@mui/icons-material/MicNone';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 
@@ -17,7 +15,6 @@ import FormattedText from '../chat_components/mensageComponents';
 import VoiceSearch from '../chat_components/VoiceSearch';
 import ImageProfessor from '../image_professor';
 import Loading from '../Loading';
-import { error } from 'console';
 
 type ChatProps = {
   userData: {
@@ -27,17 +24,19 @@ type ChatProps = {
     phone: string,
     username: string,
   } | null;
-  conversationId?: number
+  isNewConversation: boolean; 
+  conversationId?: number;
+  setIsNewConversation: (value: boolean) => void;
+  setNewConversatioId: (value: number | undefined) => void;
   setConversationId?: (value: number) => void
 }
 
-export default function Chat({userData, conversationId, setConversationId}:ChatProps) {
+export default function Chat({userData, conversationId, setConversationId, setNewConversatioId, isNewConversation, setIsNewConversation}:ChatProps) {
   const [messages, setMessages] = useState<{ role: string; content: string; save: boolean }[]>([]);
   const [userInput, setUserInput] = useState('');
   const [waiting, setWaiting] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [isListening, setIsListening] = useState<boolean>(false)
-  const [title, setTitle] = useState<string>()
   const [currentBotMessage, setCurrentBotMessage] = useState('');
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -57,12 +56,20 @@ export default function Chat({userData, conversationId, setConversationId}:ChatP
   }, [userInput]);
 
   useEffect(() => {
+    if (isNewConversation) return;
+  
     const getMessages = async () => {
+      setMessages([]);
+      
+      if (conversationId === 0) return;
+  
+      setLoadingMessages(true);  
+  
       try {
         const response = await fetch(`/api/get-conversation/${conversationId}`, { method: 'GET' });
         const data = await response.json();
-
-        if(data.length > 0){
+  
+        if (data.length > 0) {
           setMessages(data.map((msg: any) => ({
             role: msg.role,
             content: msg.content,
@@ -70,18 +77,15 @@ export default function Chat({userData, conversationId, setConversationId}:ChatP
           })));
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
       } finally {
-        setLoadingMessages(false)
+        setLoadingMessages(false);
       }
     };
-
-    setMessages([])
-    setLoadingMessages(true)
-    getMessages();
-  }, [conversationId]);
   
-
+    getMessages();
+  }, [conversationId]); 
+  
   function adjustTextareaHeight() {
     if (textareaRef.current) {
       const textarea = textareaRef.current;
@@ -113,7 +117,10 @@ export default function Chat({userData, conversationId, setConversationId}:ChatP
     let currentConversationId = conversationId;
     let conversationTitle = "Nova Conversa";
   
-    if (!currentConversationId) {
+    if (currentConversationId === 0) {
+      setIsNewConversation(true)
+
+
       try {
         const titleResponse = await Gemini({
           prompt: `Resuma esta frase em um título curto e formal:\n\n"${message}"\n\nResponda apenas com o título, sem explicações.`,
@@ -133,17 +140,18 @@ export default function Chat({userData, conversationId, setConversationId}:ChatP
         });
   
         const newConversation = await createResponse.json();
-  
+
         if (newConversation?.id) {
           currentConversationId = newConversation.id;
           setConversationId?.(newConversation.id);
+          setNewConversatioId(newConversation.id)
         }
       } catch (error) {
         console.error("Erro ao criar conversa:", error);
       }
     }
   
-    if (currentConversationId) {
+    if (currentConversationId !== 0 && currentConversationId) {
       await addMessage(currentConversationId, "user", message);
     }
   
@@ -154,7 +162,7 @@ export default function Chat({userData, conversationId, setConversationId}:ChatP
     const botMessage = { role: 'bot', content: result, save: false };
     setMessages((prev) => [...prev, botMessage]);
   
-    if (currentConversationId) {
+    if (currentConversationId !==0 && currentConversationId) {
       await addMessage(currentConversationId, "bot", result);
     }
   

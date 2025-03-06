@@ -17,6 +17,7 @@ interface DrawerProps {
   url: string;
   onOpenChange: (open: boolean) => void;
   conversationId: number |undefined;
+  createConversationFunction: () => void; 
   conversations: [{
 		id: number,
 		title: string,
@@ -27,7 +28,7 @@ interface DrawerProps {
   setConversationId: (value: number) => void
 }
 
-export default function Drawer({conversations, conversationId, setConversationId, open, onOpenChange, userData, url }: DrawerProps) {
+export default function Drawer({conversations, createConversationFunction, conversationId, setConversationId, open, onOpenChange, userData, url }: DrawerProps) {
   const groupedConversations = conversations ? groupConversations(conversations) : { today: [], yesterday: [], lastWeek: [], older: [] };
 
   return (
@@ -53,7 +54,7 @@ export default function Drawer({conversations, conversationId, setConversationId
         </div>
 
         <div>
-          <button className="flex flex-row gap-1 items-center justify-center p-2 bg-[rgba(255,255,255,0.1)] rounded-xl mb-5">
+          <button onClick={createConversationFunction} className="flex flex-row gap-1 items-center justify-center p-2 bg-[rgba(255,255,255,0.1)] rounded-xl mb-5">
             <IoMdAddCircleOutline className="text-white text-2xl"/>
             <p className={`${varela_round.className}`}>Novo chat</p>
           </button>
@@ -64,7 +65,7 @@ export default function Drawer({conversations, conversationId, setConversationId
           />
         </div>
 
-        <div className="flex flex-col overflow-auto w-full h-full">
+        <div className={styles.container_conversations}>
           {Object.entries(groupedConversations).map(([section, items]) => (
             items.length > 0 && (
               <div key={section} className="mb-4">
@@ -73,7 +74,7 @@ export default function Drawer({conversations, conversationId, setConversationId
                   <ConversationItem
                     key={item.id}
                     conversationId={conversationId}
-                    setConversationId={setConversationId}
+                    setConversationId={(value) => setConversationId(value)}
                     title={item.title}
                     id={item.id}
                   />

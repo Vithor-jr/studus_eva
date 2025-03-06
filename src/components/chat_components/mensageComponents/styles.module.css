@@ -16,8 +16,26 @@
 .container_code {
 	border-radius: 20px;
 	margin: 20px 0px;
+	max-width: calc(80vw - 30px);
+	overflow: auto;
 	background-color: #6048AC;
 	padding: 7px 0px 20px 0px;
+
+	scrollbar-width: thin;
+  scrollbar-color:  rgba(255, 255, 255, 0.1) transparent;
+
+	&::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 .container_header {

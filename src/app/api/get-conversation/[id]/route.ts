@@ -20,7 +20,7 @@ export async function GET( req: Request,
 		}
 
 
-    const apiUrl = `http://localhost:8000/messages/${conversationId}`;
+    const apiUrl = `https://${process.env.API_URL}/messages/${conversationId}`;
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
