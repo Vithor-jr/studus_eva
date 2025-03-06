@@ -12,6 +12,7 @@ import gradient from "../../assets/gradiente.png";
 import { TbMenuDeep } from "react-icons/tb";
 import eva from '../../assets/eva.png'
 import Chat from "@/components/chat";
+import Head from "next/head";
 
 interface UserData {
   id: string;
@@ -25,8 +26,10 @@ export default function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [photoURL, setPhotoURL] = useState("");
   const [loading, setLoading] = useState(true);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false); // Novo estado para abrir/fechar drawer
+  const [conversations, setConversations] = useState()
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const router = useRouter();
+  const [conversationId, setConversationId] = useState<number>()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -79,12 +82,36 @@ export default function Home() {
         }
       } catch (error) {
         console.error("Erro ao busca foto do usuário: ", error);
-      } finally {
-        setLoading(false);
       }
     };
 
+    const getCOnversations = async () => {
+      try {
+        if(userData) {
+          const response = await fetch(`/api/get-convesations/${userData?.id}`, {
+            method:'GET',
+            credentials: "include",
+          })
+  
+          if (!response.ok) {
+            throw new Error("Erro ao buscar conversas do usuário");
+          }
+  
+          const data = await response.json()
+  
+         if(data) {
+          setConversations(data)
+         }
+        }
+      } catch(error) {
+        console.error(error)
+      } finally {
+        setLoading(false);
+      }
+    }
+  
     fetchUserImage();
+    getCOnversations()
   }, [userData?.id]);
 
   if (loading) {
@@ -92,34 +119,36 @@ export default function Home() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.container_left}>
-        <Image src={studus} alt="U" className="w-[50px] mb-5" />
-        
-        <Drawer userData={userData} url={photoURL} open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+    <>
+      <div className={styles.container}>
+        <div className={styles.container_left}>
+          <div className={styles.container_image_left}>
+              <Image src={gradient} alt="gradient" className="w-[60px] z-10 h-[60px] rounded-full absolute" />
+              {photoURL !== "" ? (
+                <Image src={photoURL} alt="image" className="rounded-full z-20" width={55} height={55} />
+              ) : (
+                <Image src='https://www.pngmart.com/files/23/Profile-PNG-Photo.png' alt="image" className="rounded-full z-20" width={50} height={50} />
+              )}
+          </div>
 
-        <div className={styles.container_image_left}>
-          <Image src={gradient} alt="gradient" className="w-[60px] z-10 h-[60px] rounded-full absolute" />
-          {photoURL !== "" ? (
-            <Image src={photoURL} alt="image" className="rounded-full z-20" width={55} height={55} />
-          ) : (
-            <Image src='https://www.pngmart.com/files/23/Profile-PNG-Photo.png' alt="image" className="rounded-full z-20" width={50} height={50} />
-          )}
+          <Drawer conversationId={conversationId} setConversationId={(value:number)=>setConversationId(value)} conversations={conversations} userData={userData} url={photoURL} open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+
+          <Image src={studus} alt="U" className="w-[50px] absolute bottom-[30px]" />
+        </div>
+
+        <div className={styles.container_right}>
+          <div className={styles.container_header}>
+            <button onClick={() => setIsDrawerOpen(true)} className={styles.button_open_draw}>
+              <TbMenuDeep className="text-[white] text-[2rem] scale-x-[-1]"/>
+            </button>
+
+            <Image src={eva} alt="eva" className="h-[60px] w-[60px]"/>
+            <h1 className={`${varela_round.className} ${styles.title_eva}`}>Eva</h1>
+          </div>
+            
+          <Chat userData={userData} setConversationId={(value) => setConversationId(value)} conversationId={conversationId}/>
         </div>
       </div>
-
-      <div className={styles.container_right}>
-        <div className={styles.container_header}>
-          <button onClick={() => setIsDrawerOpen(true)} className={styles.button_open_draw}>
-            <TbMenuDeep className="text-[white] text-[2rem] scale-x-[-1]"/>
-          </button>
-
-          <Image src={eva} alt="eva" className="h-[60px] w-[60px]"/>
-          <h1 className={`${varela_round.className} ${styles.title_eva}`}>Eva</h1>
-        </div>
-          
-        <Chat/>
-      </div>
-    </div>
+    </>
   );
 }

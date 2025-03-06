@@ -10,6 +10,8 @@ export default {
   theme: {
   	extend: {
   		colors: {
+				selectedBg: 'rgba(255,255,255,0.1)',
+        hoverBg: 'rgba(255,255,255,0.05)',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

@@ -16,17 +16,32 @@ import FormattedText from '../chat_components/mensageComponents';
 
 import VoiceSearch from '../chat_components/VoiceSearch';
 import ImageProfessor from '../image_professor';
+import Loading from '../Loading';
+import { error } from 'console';
 
+type ChatProps = {
+  userData: {
+    id: string,
+    name: string,
+    email: string,
+    phone: string,
+    username: string,
+  } | null;
+  conversationId?: number
+  setConversationId?: (value: number) => void
+}
 
-export default function Chat() {
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
+export default function Chat({userData, conversationId, setConversationId}:ChatProps) {
+  const [messages, setMessages] = useState<{ role: string; content: string; save: boolean }[]>([]);
   const [userInput, setUserInput] = useState('');
   const [waiting, setWaiting] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [isListening, setIsListening] = useState<boolean>(false)
+  const [title, setTitle] = useState<string>()
   const [currentBotMessage, setCurrentBotMessage] = useState('');
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [loadingMessages, setLoadingMessages] = useState(false)
 
   useEffect(() => {
     if (chatWindowRef.current) {
@@ -40,6 +55,32 @@ export default function Chat() {
   useEffect(() => {
     adjustTextareaHeight();
   }, [userInput]);
+
+  useEffect(() => {
+    const getMessages = async () => {
+      try {
+        const response = await fetch(`/api/get-conversation/${conversationId}`, { method: 'GET' });
+        const data = await response.json();
+
+        if(data.length > 0){
+          setMessages(data.map((msg: any) => ({
+            role: msg.role,
+            content: msg.content,
+            save: true
+          })));
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setLoadingMessages(false)
+      }
+    };
+
+    setMessages([])
+    setLoadingMessages(true)
+    getMessages();
+  }, [conversationId]);
+  
 
   function adjustTextareaHeight() {
     if (textareaRef.current) {
@@ -64,29 +105,94 @@ export default function Chat() {
     setLoading(true);
     setUserInput('');
   
-    const userMessage = { role: 'user', content: message };
+    const userMessage = { role: 'user', content: message, save: true };
     setMessages((prev) => [...prev, userMessage]);
   
     setWaiting(true);
   
+    let currentConversationId = conversationId;
+    let conversationTitle = "Nova Conversa";
+  
+    if (!currentConversationId) {
+      try {
+        const titleResponse = await Gemini({
+          prompt: `Resuma esta frase em um título curto e formal:\n\n"${message}"\n\nResponda apenas com o título, sem explicações.`,
+        });
+  
+        if (titleResponse) {
+          conversationTitle = titleResponse.trim();
+        }
+  
+        const createResponse = await fetch(`/api/create-conversation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: userData?.id,
+            title: conversationTitle,
+          }),
+        });
+  
+        const newConversation = await createResponse.json();
+  
+        if (newConversation?.id) {
+          currentConversationId = newConversation.id;
+          setConversationId?.(newConversation.id);
+        }
+      } catch (error) {
+        console.error("Erro ao criar conversa:", error);
+      }
+    }
+  
+    if (currentConversationId) {
+      await addMessage(currentConversationId, "user", message);
+    }
+  
     const previousMessages = messages.map((msg) => msg.content).join('\n');
     const context = `${previousMessages}\nuser: ${message}`;
-  
     const result = await Gemini({ prompt: context });
   
-    const botMessage = { role: 'bot', content: result };
+    const botMessage = { role: 'bot', content: result, save: false };
     setMessages((prev) => [...prev, botMessage]);
   
+    if (currentConversationId) {
+      await addMessage(currentConversationId, "bot", result);
+    }
+  
     setCurrentBotMessage(result);
-    setLoading(false)
+    setLoading(false);
     setWaiting(false);
   }
+  
   
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === 'Enter' && !event.shiftKey && userInput !== '' && !loading) {
       event.preventDefault();
       Enviar();
     }
+  }
+
+  const addMessage = async (conversationId: number, role:string, content:string) => {
+    try {
+      await fetch(`/api/add-message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId: conversationId,
+          role: role,
+          content: content,
+        }),
+      });
+    } catch (error) {
+      console.error("Erro ao enviar mensagem:", error);
+    }
+  }
+
+  if(loadingMessages) {
+    return (
+      <div className={`${styles.container_chat} h-full w-full`}>
+        <Loading message='Carregando conversa'/>
+      </div>
+    )
   }
 
   return (
@@ -102,17 +208,19 @@ export default function Chat() {
 
 				<div className={styles.container_body}>
           <div ref={chatWindowRef} className={`${styles.chatWindow} ${varela_round.className}`}>
-            {messages.map((msg, index) => (
+            {messages.length > 0 && messages.map((msg, index) => (
               <div key={index} className={`${styles.chatBubble} ${styles[msg.role]}`}>
                 {msg.role === 'bot' ? (
-                  ( index === messages.length - 1 ) ? (
+                  (index === messages.length - 1 && !msg.save) ? (
                     <FormattedText text={currentBotMessage} />
                   ) : (
                     <FormattedText text={msg.content} />
                   )
                 ) : ( msg.content )}
+
               </div>
-            ))}
+            ))
+          }
 
             {waiting && (
               <div className={`${styles.chatBubble} ${styles.bot}`}>

@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['i.imgur.com', 'www.pngmart.com'], // Adicione os domínios que você precisa
   },
+  
 };
 
 

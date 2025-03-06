@@ -4,8 +4,7 @@ import Image from "next/image";
 import Logo from '../../assets/logo.png';
 import { varela_round } from "@/app/fonts/fonts";
 
-export default function Loading() {
-  // Animação de onda para as letras e imagem
+export default function Loading({message}:{message?: string}) {
   const waveAnimation1 = {
     y: [0, -20, 0],
     transition: {
@@ -128,7 +127,7 @@ export default function Loading() {
 
       {/* Texto "Aguarde..." com animação nos pontinhos */}
 			<div className="flex flex-row">
-				<motion.p className={`${varela_round.className}`}>Aguarde</motion.p>
+				<motion.p className={`${varela_round.className}`}>{message || 'Aguarde'}</motion.p>
 				<motion.p initial={{opacity:0}} className={`${varela_round.className}`} animate={dotAnimation(0)}>.</motion.p>
 				<motion.p initial={{opacity:0}}className={`${varela_round.className}`} animate={dotAnimation(0.2)}>.</motion.p>
 				<motion.p initial={{opacity:0}} className={`${varela_round.className}`} animate={dotAnimation(0.4)}>.</motion.p>
