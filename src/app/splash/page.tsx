@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import styles from "./styles.module.css";
 import logo from "../../assets/logo.png";
 import { varela_round } from "@/app/fonts/fonts";
@@ -12,28 +11,46 @@ import { varela_round } from "@/app/fonts/fonts";
 export default function SplashScreen() {
   const [visible, setVisible] = useState(true);
   const [showSecondText, setShowSecondText] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(false); 
   const router = useRouter();
 
   useEffect(() => {
-    const token = Cookies.get("token");
-
-    if (token) {
-      router.replace("/home");
-      return;
-    }
-
     setTimeout(() => {
       setShowSecondText(true);
     }, 2000);
 
     setTimeout(() => {
-      setVisible(false);
+      setVisible(false); 
+      setAnimationComplete(true);
     }, 3000);
+  }, []);
 
-    setTimeout(() => {
-      router.replace("/login");
-    }, 4000);
-  }, [router]);
+  useEffect(() => {
+    if (!animationComplete) return; 
+
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/verify-token', {
+          method: 'GET',
+          credentials: 'include', 
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Usuário autenticado:', data.user);
+          router.replace('/home');
+        } else {
+          console.log('Usuário não autenticado');
+          router.replace('/login')
+        }
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+        router.replace('/login');
+      }
+    };
+  
+    checkAuth();
+  }, [animationComplete, router]);
 
   return (
     <motion.div
@@ -44,7 +61,9 @@ export default function SplashScreen() {
       }}
       transition={{ duration: 1 }}
       onAnimationComplete={() => {
-        if (!visible) router.push("/login");
+        if (!visible) {
+          setAnimationComplete(true);
+        }
       }}
       className="fixed inset-0 flex items-center justify-center"
     >

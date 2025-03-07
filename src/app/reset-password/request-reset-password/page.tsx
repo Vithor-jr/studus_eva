@@ -32,6 +32,29 @@ export default function ResetPassword() {
     }
   }, [submit, email])
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/verify-token', {
+          method: 'GET',
+          credentials: 'include', 
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Usuário autenticado:', data.user);
+          route.replace('/home');
+        } else {
+          console.log('Usuário não autenticado');
+        }
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+      }
+    };
+
+    checkAuth();
+  }, [route]);
+
   const SendEmail = async () => {
     setLoading(true);
     setSubmit(true);

@@ -1,4 +1,4 @@
-/* styles.module.css */
+
 .title1 {
   font-size: 2em;
   color: var(--theme-primary);
@@ -16,8 +16,7 @@
 .container_code {
 	border-radius: 20px;
 	margin: 20px 0px;
-	max-width: calc(80vw - 30px);
-	overflow: auto;
+	overflow-x: auto;
 	background-color: #6048AC;
 	padding: 7px 0px 20px 0px;
 
@@ -38,8 +37,12 @@
   }
 }
 
-.container_header {
+.codeblock {
 	width: 100%;
+}
+
+
+.container_header {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;

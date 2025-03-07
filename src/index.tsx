@@ -31,12 +31,6 @@ export default function Home() {
   const [conversations, setConversations] = useState()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const [isMobile, setIsMobile] = useState(() => {
-    return typeof window !== "undefined" ? window.innerWidth < 780 : false;
-  });
-  
   const [isNewConversation, setIsNewConversation] = useState<boolean>(false)
   const [conversationId, setConversationId] = useState<number>(0)
 
@@ -123,68 +117,38 @@ export default function Home() {
     getCOnversations()
   }, [userData?.id, newCOnversationId]);
 
-useEffect(() => {
-  const handleResize = () => {
-    const mobile = window.innerWidth < 780;
-    setIsMobile(mobile);
-
-    if (mobile) {
-      setIsOpen(false)
-      setIsDrawerOpen(false);
-    }
-  };
-
-  window.addEventListener("resize", handleResize);
-  handleResize();
-
-  return () => {
-    window.removeEventListener("resize", handleResize);
-  };
-}, []);
-
-
   if (loading) {
     return <Loading />;
   }
 
   return (
+    <>
       <div className={styles.container}>
-        {isMobile ? (
+        
+        <div className={styles.container_left}>
+          <div className={styles.container_image_left}>
+              <Image src={gradient} alt="gradient" className="w-[60px] z-10 h-[60px] rounded-full absolute" />
+              {photoURL !== "" ? (
+                <Image src={photoURL} alt="image" className="rounded-full z-20" width={55} height={55} />
+              ) : (
+                <Image src='https://www.pngmart.com/files/23/Profile-PNG-Photo.png' alt="image" className="rounded-full z-20" width={50} height={50} />
+              )}
+          </div>
+
           <Drawer 
-            createConversationFunction={() => {
-              setIsNewConversation(false);
-              setConversationId(0);
-            }}
-            conversationId={conversationId}
-            setConversationId={(value: number) => {
-              setConversationId(value);
-              setIsNewConversation(false);
-            }}
-            conversations={conversations}
+            createConversationFunction={()=>{setIsNewConversation(false), setConversationId(0)}}
+            conversationId={conversationId} 
+            setConversationId={(value:number)=>{setConversationId(value), setIsNewConversation(false)}} 
+            conversations={conversations} 
             userData={userData}
             url={photoURL}
             open={isDrawerOpen}
             onOpenChange={setIsDrawerOpen}
           />
-        ) : (
-          <Sidebar
-            isOpen={isOpen}
-            setIsOpen={(boolean) => setIsOpen(boolean)}
-            createConversationFunction={() => {
-              setIsNewConversation(false);
-              setConversationId(0);
-            }}
-            conversationId={conversationId}
-            setConversationId={(value: number) => {
-              setConversationId(value);
-              setIsNewConversation(false);
-            }}
-            conversations={conversations}
-            userData={userData}
-            url={photoURL}
-          />
-        )}
-        
+
+          <Image src={studus} alt="U" className="w-[50px] absolute bottom-[30px]" />
+        </div>
+
         <div className={styles.container_right}>
           <div className={styles.container_header}>
             <button onClick={() => setIsDrawerOpen(true)} className={styles.button_open_draw}>
@@ -205,5 +169,6 @@ useEffect(() => {
           />
         </div>
       </div>
+    </>
   );
 }

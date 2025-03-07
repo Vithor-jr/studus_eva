@@ -3,7 +3,7 @@
 import styles from './styles.module.css';
 import ImageLogin from '@/components/imageLogin';
 import { varela_round } from '../fonts/fonts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import InputForm from '@/components/input_form';
 import ButtonSend from '@/components/button_send';
 import Loading from '@/components/Loading';
@@ -16,11 +16,31 @@ export default function Login() {
   const [loading, setLoading] = useState<boolean>(false);
   const [serverError, setServerError] = useState<{ type: string; text: string }>({ type: '', text: '' });
   const [openModal, setOpenModal] = useState<boolean>(false);
-
+  const router = useRouter();
   const [errorEmail, setErrorEmail] = useState<string>('');
   const [errorPassword, setErrorPassword] = useState<string>('');
 
-  const route = useRouter();
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/verify-token', {
+          method: 'GET',
+          credentials: 'include', 
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          router.replace('/home');
+        } else {
+          console.log('Usuário não autenticado');
+        }
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -62,8 +82,7 @@ export default function Login() {
       const data = await response.json();
       
       if (response.ok) {
-        
-      route.push('/home');
+        router.push('/home'); // Redireciona para a página inicial após o login
       } else {
         setServerError({ type: 'error', text: data.message || 'E-mail ou senha inválida.' });
         setOpenModal(true);
@@ -71,7 +90,7 @@ export default function Login() {
     } catch (err) {
       setServerError({ type: 'error', text: 'Erro de conexão. Verifique sua internet e tente novamente.' });
       setOpenModal(true);
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -109,7 +128,7 @@ export default function Login() {
             />
             {errorPassword && <p className={`${varela_round.className} text-red-500 text-sm w-[100%]`}>{errorPassword}</p>}
 
-            <button onClick={() => route.push('/reset-password/request-reset-password')}>
+            <button onClick={() => router.push('/reset-password/request-reset-password')}>
               <p className={`${varela_round.className} border-[#FF7300] border-b-2 mt-3`}>Esqueceu a senha?</p>
             </button>
           </div>
@@ -119,7 +138,7 @@ export default function Login() {
 
             <p className={`${varela_round.className}`}>
               Não possui uma conta?
-              <button className="border-b-2 border-[#FF7300] ms-2" onClick={() => route.push('/register')}>entre aqui</button>
+              <button className="border-b-2 border-[#FF7300] ms-2" onClick={() => router.push('/register')}>entre aqui</button>
             </p>
           </div>
           

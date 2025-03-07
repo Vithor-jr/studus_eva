@@ -208,7 +208,7 @@ export default function Chat({userData, conversationId, setConversationId, setNe
         <ImageProfessor/>
 
         <VoiceSearch 
-           onSearch={(query: string) => console.log('Busca:', query)}
+          onSearch={(query: string) => console.log('Busca:', query)}
           open={isListening} 
           onConfirm={handleVoiceConfirm}
           handleClose={()=>setIsListening(false)}          

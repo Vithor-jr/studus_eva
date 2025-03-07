@@ -7,6 +7,8 @@ import { coldarkCold, coldarkDark } from 'react-syntax-highlighter/dist/esm/styl
 import styles from './styles.module.css';
 import { varela_round } from '@/app/fonts/fonts';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { codeToHtml } from 'shiki'
+
 
 type Params = {
   text: string;
@@ -20,7 +22,6 @@ export default function FormattedText({ text }: Params) {
   };
 
   return (
-    <div>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
@@ -39,7 +40,7 @@ export default function FormattedText({ text }: Params) {
           sup: ({...props}) => <sup className={styles.sup} {...props} />,
           sub: ({...props}) => <sub className={styles.sub} {...props} />,
           code({className, children, ...props }) { 
-            const match = /language-(\w+)/.exec(className || ''); 
+            const match = /language-(\w+)/.exec(className || '')
               return match ? ( 
                <div className={styles.container_code}>
                  <div className={styles.container_header}>
@@ -50,14 +51,14 @@ export default function FormattedText({ text }: Params) {
                   </button>
                  </div>
 
-                 <SyntaxHighlighter 
-                    style={theme} 
-                    language={match[1]}
-                    PreTag='div'
-                    className={styles.codeblock}
-                  >
-                    {String(children).replace(/\n$/, '')}
-                  </SyntaxHighlighter>
+                  <SyntaxHighlighter 
+                      style={theme} 
+                      language={match[1]}
+                      PreTag='div'
+                      className={styles.codeblock}
+                    >
+                      {String(children).replace(/\n$/, '')}
+                    </SyntaxHighlighter>
                </div>
                 ) :  ( 
                   <code className={styles.codeLine} {...props}> {children} </code> 
@@ -67,6 +68,5 @@ export default function FormattedText({ text }: Params) {
       >
         {text}
       </ReactMarkdown>
-    </div>
   );
 }

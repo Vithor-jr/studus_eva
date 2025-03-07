@@ -42,6 +42,28 @@ export default function EnterCod(){
     if (submited) validate()
   }, [password, confirmPassword, passwordErrors])
 
+	useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/verify-token', {
+          method: 'GET',
+          credentials: 'include', 
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Usuário autenticado:', data.user);
+          router.replace('/home');
+        } else {
+          console.log('Usuário não autenticado');
+        }
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem('resetToken');

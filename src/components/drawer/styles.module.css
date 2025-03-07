@@ -20,6 +20,16 @@
 	justify-content: center;
 }
 
+.container_drawer {
+	display: block;
+}
+
+@media (min-width: 780px) {
+	.container_drawer {
+		display: none;
+	}
+}
+
 .container_conversations {
 	display: flex;
 	flex-direction: column;
