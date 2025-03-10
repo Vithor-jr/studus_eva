@@ -82,10 +82,11 @@ export default function Login() {
       const data = await response.json();
       
       if (response.ok) {
-        router.push('/home'); // Redireciona para a página inicial após o login
+        router.push('/home');
       } else {
         setServerError({ type: 'error', text: data.message || 'E-mail ou senha inválida.' });
         setOpenModal(true);
+        setLoading(false);
       }
     } catch (err) {
       setServerError({ type: 'error', text: 'Erro de conexão. Verifique sua internet e tente novamente.' });

@@ -12,11 +12,6 @@
   display: none;
 }
 
-/* 
-  O erro está no 100%, uma vez que ele rederiza com base no item pai
-  Isso faz com que ele não leve em consideração o sideBar
-*/
-
 .container_chat {
   z-index: 2;
   padding: 0px 20px;
@@ -73,7 +68,7 @@
   justify-content: space-between;
   overflow: hidden;
 
-  max-width: 60vw;
+  max-width: 60%;
 }
 
 @media (max-width: 780px) {

@@ -55,7 +55,9 @@ export default function FormattedText({ text }: Params) {
                       style={theme} 
                       language={match[1]}
                       PreTag='div'
-                      className={styles.codeblock}
+                      showLineNumbers
+                      lineProps={{style: {wordBreak: 'break-all', whiteSpace: 'pre-wrap'}}}
+                      className={`${styles.codeblock} ${varela_round.className}`}
                     >
                       {String(children).replace(/\n$/, '')}
                     </SyntaxHighlighter>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
 import Drawer from "@/components/drawer";
@@ -37,6 +37,8 @@ export default function Home() {
     return typeof window !== "undefined" ? window.innerWidth < 780 : false;
   });
   
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(0);
   const [isNewConversation, setIsNewConversation] = useState<boolean>(false)
   const [conversationId, setConversationId] = useState<number>(0)
 
@@ -123,24 +125,19 @@ export default function Home() {
     getCOnversations()
   }, [userData?.id, newCOnversationId]);
 
-useEffect(() => {
-  const handleResize = () => {
-    const mobile = window.innerWidth < 780;
-    setIsMobile(mobile);
+  useEffect(() => {
+    if (!containerRef.current) return;
 
-    if (mobile) {
-      setIsOpen(false)
-      setIsDrawerOpen(false);
-    }
-  };
+    const observer = new ResizeObserver(() => {
+      if (containerRef.current) {
+        setSize(containerRef.current.clientWidth);
+      }
+    });
 
-  window.addEventListener("resize", handleResize);
-  handleResize();
+    observer.observe(containerRef.current);
 
-  return () => {
-    window.removeEventListener("resize", handleResize);
-  };
-}, []);
+    return () => observer.disconnect();
+  }, []);
 
 
   if (loading) {
@@ -148,7 +145,7 @@ useEffect(() => {
   }
 
   return (
-      <div className={styles.container}>
+      <div className={styles.container} ref={containerRef}>
         {isMobile ? (
           <Drawer 
             createConversationFunction={() => {
